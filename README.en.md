@@ -1,36 +1,51 @@
 # flutter_serial_port_api
 
-#### Description
-封装串口相关api的flutter插件
 
-#### Software Architecture
-Software architecture description
+A Flutter plugin based on [Android-SerialPort-API](https://github.com/cepr/android-serialport-api).
 
-#### Installation
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Instructions
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Contribution
-
-1.  Fork the repository
-2.  Create Feat_xxx branch
-3.  Commit your code
-4.  Create Pull Request
+This plugin works only for Android devices.
 
 
-#### Gitee Feature
+## Usage
 
-1.  You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2.  Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3.  Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4.  The most valuable open source project [GVP](https://gitee.com/gvp)
-5.  The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+### List devices
+
+``` dart
+import 'package:flutter_serial_port_api/flutter_serial_port_api.dart';
+
+Future<List<Device>> findDevices() async {
+  return await FlutterSerialPort.listDevices();
+}
+```
+
+### Create `SerialPort` for certain device
+
+``` dart
+Device theDevice = Device("deviceName", "/your/device/path");
+int baudrate = 9600;
+var serialPort = await FlutterSerialPort.createSerialPort(theDevice, baudrate);
+//int parity = 0;
+//int dataBits = 8;
+//int stopBit = 1;
+//var serialPort = await FlutterSerialPort.createSerialPort(theDevice, baudrate, parity:parity, dataBits:dataBits, stopBit:stopBit);
+```
+
+### Open/Close device
+
+``` dart
+bool openResult = await serialPort.open();
+print(serialPort.isConnected) // true
+bool closeResult = await serialPort.close();
+print(serialPort.isConnected) // false
+```
+
+### Read/Write data from/to device
+
+``` dart
+// Listen to `receiveStream`
+serialPort.receiveStream.listen((recv) {
+  print("Receive: $recv");
+});
+
+bool writeResult = serialPort.write(Uint8List.fromList("Write some data".codeUnits));
+```

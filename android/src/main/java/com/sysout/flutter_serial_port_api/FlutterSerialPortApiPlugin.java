@@ -109,12 +109,12 @@ public class FlutterSerialPortApiPlugin implements FlutterPlugin, MethodCallHand
                 break;
             case "getAllDevices":
                 ArrayList<String> devices = getAllDevices();
-                Log.d(TAG, devices.toString());
+                Log.d(TAG, "AllDevices:" + devices.toString());
                 result.success(devices);
                 break;
             case "getAllDevicesPath":
                 ArrayList<String> devicesPath = getAllDevicesPath();
-                Log.d(TAG, devicesPath.toString());
+                Log.d(TAG, "AllDevicesPath:" + devicesPath.toString());
                 result.success(devicesPath);
                 break;
             default:

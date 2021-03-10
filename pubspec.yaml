@@ -1,8 +1,8 @@
 name: flutter_serial_port_api
-description: A new flutter plugin project.
+description: Serial port library based on Android-SerialPort-API.
 version: 0.0.1
-author:
-homepage:
+author: Fu Liang <lucasryan@foxmail.com>
+homepage: https://gitee.com/liang-fu/flutter_serial_port_api
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

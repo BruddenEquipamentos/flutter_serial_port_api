@@ -1,37 +1,51 @@
 # flutter_serial_port_api
 
-#### 介绍
-封装串口相关api的flutter插件
 
-#### 软件架构
-软件架构说明
+A Flutter plugin based on [Android-SerialPort-API](https://github.com/cepr/android-serialport-api).
 
-
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+This plugin works only for Android devices.
 
 
-#### 特技
+## Usage
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+### List devices
+
+``` dart
+import 'package:flutter_serial_port_api/flutter_serial_port_api.dart';
+
+Future<List<Device>> findDevices() async {
+  return await FlutterSerialPort.listDevices();
+}
+```
+
+### Create `SerialPort` for certain device
+
+``` dart
+Device theDevice = Device("deviceName", "/your/device/path");
+int baudrate = 9600;
+var serialPort = await FlutterSerialPort.createSerialPort(theDevice, baudrate);
+//int parity = 0;
+//int dataBits = 8;
+//int stopBit = 1;
+//var serialPort = await FlutterSerialPort.createSerialPort(theDevice, baudrate, parity:parity, dataBits:dataBits, stopBit:stopBit);
+```
+
+### Open/Close device
+
+``` dart
+bool openResult = await serialPort.open();
+print(serialPort.isConnected) // true
+bool closeResult = await serialPort.close();
+print(serialPort.isConnected) // false
+```
+
+### Read/Write data from/to device
+
+``` dart
+// Listen to `receiveStream`
+serialPort.receiveStream.listen((recv) {
+  print("Receive: $recv");
+});
+
+bool writeResult = serialPort.write(Uint8List.fromList("Write some data".codeUnits));
+```

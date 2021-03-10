@@ -71,6 +71,7 @@ class _MyAppState extends State<MyApp> {
                           const Duration(
                               milliseconds: 500))));
                   if (!isPortOpened) {
+                    FlutterSerialPortApi.listDevices();
                     Device theDevice = Device("ttyS1", "/dev/ttyS1");
                     int baudrate = 9600;
                     var serialPort = await FlutterSerialPortApi.createSerialPort(theDevice, baudrate);

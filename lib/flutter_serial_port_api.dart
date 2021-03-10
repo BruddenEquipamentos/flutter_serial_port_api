@@ -18,7 +18,7 @@ class FlutterSerialPortApi {
     List devices = await _channel.invokeMethod("getAllDevices");
     List devicesPath = await _channel.invokeMethod("getAllDevicesPath");
 
-    List<Device> deviceList = List<Device>();
+    List<Device> deviceList = [];
     devices.asMap().forEach((index, deviceName) {
       deviceList.add(Device(deviceName, devicesPath[index]));
     });
@@ -29,6 +29,8 @@ class FlutterSerialPortApi {
   static Future createSerialPort(Device device, int baudrate, {int parity = 0, int dataBits = 8, int stopBit = 1}) async {
     return SerialPort(_channel.name, device, baudrate, parity, dataBits, stopBit);
   }
+
+
 }
 
 
