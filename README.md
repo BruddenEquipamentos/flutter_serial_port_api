@@ -1,18 +1,30 @@
 # flutter_serial_port_api
 
 
-A Flutter plugin based on [Android-SerialPort-API](https://github.com/cepr/android-serialport-api).
+基于 [Android-SerialPort-API](https://github.com/cepr/android-serialport-api) 的串口通讯库，增加可配置奇偶校验、数据位、停止位.
 
 This plugin works only for Android devices.
 
-
 ## Usage
+
+### dependencies
+
+``` dart
+flutter_serial_port_api:
+    git:
+      url: https://gitee.com/liang-fu/flutter_serial_port_api.git
+      ref: V0.0.1   #通过ref指定依赖某个提交的版本、分支或者tag
+```
+
+### import
+
+``` dart
+import 'package:flutter_serial_port_api/flutter_serial_port_api.dart';
+```
 
 ### List devices
 
 ``` dart
-import 'package:flutter_serial_port_api/flutter_serial_port_api.dart';
-
 Future<List<Device>> findDevices() async {
   return await FlutterSerialPort.listDevices();
 }
