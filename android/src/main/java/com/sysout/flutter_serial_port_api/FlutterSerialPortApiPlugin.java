@@ -55,13 +55,18 @@ public class FlutterSerialPortApiPlugin implements FlutterPlugin, MethodCallHand
             while (!isInterrupted()) {
                 int size;
                 try {
-                    byte[] buffer = new byte[1024];
                     if (mInputStream == null)
                         return;
+                    byte[] buffer = new byte[1024];
                     size = mInputStream.read(buffer);
                     // Log.d(TAG, "read size: " + String.valueOf(size));
                     if (size > 0) {
                         onDataReceived(buffer, size);
+                    }
+                    try {
+                        Thread.sleep(10);//延时10ms
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
