@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -17,38 +18,39 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
 
   bool isPortOpened = false;
   SerialPort _serialPort;
   StreamSubscription _subscription;
-  List<Widget> _historyData = [];
-  bool isHexMode = false;
+  bool isHexMode = true;
+  String readData = '';
+
+  List<String> pathList = <String>[];
+  String sPortPath = '';
+  List<int> baudrateList = <int>[0,50,75,110,134,150,200,300,600,1200,1800,2400,4800,9600,19200,38400,57600,115200,230400,460800,500000,576000,921600,1000000,1152000,1500000,2000000,2500000,3000000,3500000,4000000];
+  int baudrate = 115200;
+  List<int> parityList = <int>[0, 1, 2];
+  int parity = 0;
+  List<int> dataBitsList = <int>[5, 6, 7, 8];
+  int dataBits = 8;
+  List<int> stopBitList = <int>[1, 2];
+  int stopBit = 1;
+  String writeData = '';
+
+  _initPortList() async {
+    List<Device> deviceList = await FlutterSerialPortApi.listDevices();
+    if(null != deviceList && deviceList.isNotEmpty){
+      sPortPath = deviceList[0].path;
+      deviceList.forEach((device) {
+        pathList.add(device.path);
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await FlutterSerialPortApi.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+    _initPortList();
   }
 
   @override
@@ -58,63 +60,197 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
+        body: Container(
 //          Text('Running on: $_platformVersion\n')
           child: Column(
             children: [
-              InkWell(
-                onTap: () async {
-                  final debounceTransformer =
-                  StreamTransformer<Uint8List,
-                      dynamic>.fromBind(
-                          (s) => s.transform(debounceBuffer(
-                          const Duration(
-                              milliseconds: 500))));
-                  if (!isPortOpened) {
-                    FlutterSerialPortApi.listDevices();
-                    Device theDevice = Device("ttyS1", "/dev/ttyS1");
-                    int baudrate = 9600;
-                    var serialPort = await FlutterSerialPortApi.createSerialPort(theDevice, baudrate);
-                    bool openResult = await serialPort.open();
-                    setState(() {
-                      _serialPort = serialPort;
-                      isPortOpened = openResult;
-                    });
-                    _subscription = _serialPort.receiveStream
-                        .transform(debounceTransformer)
-                        .listen((recv) {
-                      print("Receive: $recv");
-                      String recvData =
-                      formatReceivedData(recv);
-                      setState(() {
-                        _historyData
-                            .add(Text(">>> $recvData"));
-                      });
-                    });
-                  }else {
-                    bool closeResult =
-                    await _serialPort.close();
-                    setState(() {
-                      _serialPort = null;
-                      isPortOpened = !closeResult;
-                    });
-                    _subscription = null;
-                    print("closeResult: $closeResult");
-                  }
-                },
-                child: !isPortOpened ? Text("Open") : Text("Close"),
+              Container(
+                color: Colors.black,
+                width: double.infinity,
+                height: 300,
+                child: Text('$readData', style: TextStyle(color: Colors.white)),
               ),
-              InkWell(
-                onTap:() async {
-                  _serialPort.write(Uint8List.fromList(hexToUnits('AABBCCDD')));
-                },
-                child:Text('write : AABBCCDD'),
+              Row(
+                children: [
+                  DropdownButton<String>(
+                    value: sPortPath,
+                    style: TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (String newValue) {
+                      setState(() {
+                        sPortPath = newValue;
+                      });
+                    },
+                    items: pathList.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  DropdownButton<int>(
+                    value: baudrate,
+                    style: TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (int newValue) {
+                      setState(() {
+                        baudrate = newValue;
+                      });
+                    },
+                    items: baudrateList.map<DropdownMenuItem<int>>((int value) {
+                      return DropdownMenuItem<int>(
+                        value: value,
+                        child: Text(value.toString()),
+                      );
+                    }).toList(),
+                  ),
+                  Text('奇偶校验: '),
+                  DropdownButton<int>(
+                    value: parity,
+                    style: TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (int newValue) {
+                      setState(() {
+                        parity = newValue;
+                      });
+                    },
+                    items: parityList.map<DropdownMenuItem<int>>((int value) {
+                      return DropdownMenuItem<int>(
+                        value: value,
+                        child: Text(value.toString()),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('数据位: '),
+                  DropdownButton<int>(
+                    value: dataBits,
+                    style: TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (int newValue) {
+                      setState(() {
+                        dataBits = newValue;
+                      });
+                    },
+                    items: dataBitsList.map<DropdownMenuItem<int>>((int value) {
+                      return DropdownMenuItem<int>(
+                        value: value,
+                        child: Text(value.toString()),
+                      );
+                    }).toList(),
+                  ),
+                  Text('停止位: '),
+                  DropdownButton<int>(
+                    value: stopBit,
+                    style: TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (int newValue) {
+                      setState(() {
+                        stopBit = newValue;
+                      });
+                    },
+                    items: stopBitList.map<DropdownMenuItem<int>>((int value) {
+                      return DropdownMenuItem<int>(
+                        value: value,
+                        child: Text(value.toString()),
+                      );
+                    }).toList(),
+                  ),
+                  ElevatedButton(
+                      onPressed: () async {
+                        final debounceTransformer =
+                        StreamTransformer<Uint8List,
+                            dynamic>.fromBind(
+                                (s) => s.transform(debounceBuffer(
+                                const Duration(
+                                    milliseconds: 500))));
+                        if (!isPortOpened) {
+                          if(sPortPath == ''){
+                            Fluttertoast.showToast(msg: '请选择串口！', toastLength: Toast.LENGTH_SHORT);
+                            return;
+                          }
+                          Device theDevice = Device(sPortPath, sPortPath);
+                          var serialPort = await FlutterSerialPortApi.createSerialPort(theDevice, baudrate);
+                          bool openResult = await serialPort.open();
+                          setState(() {
+                            _serialPort = serialPort;
+                            isPortOpened = openResult;
+                          });
+                          _subscription = _serialPort.receiveStream
+                              .transform(debounceTransformer)
+                              .listen((recv) {
+                            print("Receive: $recv");
+                            String recvData = formatReceivedData(recv);
+                            setState(() {
+                              readData += '\n\r>>>[$sPortPath]>>> $recvData';
+                            });
+                          });
+                        }else {
+                          bool closeResult =
+                          await _serialPort.close();
+                          setState(() {
+                            _serialPort = null;
+                            isPortOpened = !closeResult;
+                          });
+                          _subscription = null;
+                          print("closeResult: $closeResult");
+                        }
+                      },
+                      child: !isPortOpened ? Text("开启") : Text("关闭")
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
+                    width: 200,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(10.0),
+                      ),
+                      onChanged: _textFieldChanged,
+                      autofocus: false,
+                    ),
+                  ),
+                  ElevatedButton(
+                      onPressed: (){
+                        if(_serialPort == null){
+                          Fluttertoast.showToast(msg: '请先打开串口！', toastLength: Toast.LENGTH_SHORT);
+                          return;
+                        }
+                        _serialPort.write(Uint8List.fromList(hexToUnits(writeData)));
+                      },
+                      child: Text('发送')
+                  )
+                ],
               )
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _textFieldChanged(String str) {
+    writeData = str;
   }
 
   String intToHex(int i, {int pad=2}) {
