@@ -188,7 +188,7 @@ class _MyAppState extends State<MyApp> {
                             return;
                           }
                           Device theDevice = Device(sPortPath, sPortPath);
-                          var serialPort = await FlutterSerialPortApi.createSerialPort(theDevice, baudrate);
+                          var serialPort = await FlutterSerialPortApi.createSerialPort(theDevice, baudrate, parity: parity, dataBits: dataBits, stopBit: stopBit);
                           bool openResult = await serialPort.open();
                           setState(() {
                             _serialPort = serialPort;
