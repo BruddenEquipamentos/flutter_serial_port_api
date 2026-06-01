@@ -12,8 +12,8 @@ This plugin works only for Android devices.
 ``` dart
 flutter_serial_port_api:
     git:
-      url: https://gitee.com/liang-fu/flutter_serial_port_api.git
-      ref: V0.0.1   #通过ref指定依赖某个提交的版本、分支或者tag
+      url: https://github.com/BruddenEquipamentos/flutter_serial_port_api.git
+      ref: master
 ```
 
 ### import
