@@ -1,3 +1,7 @@
+## 0.1.0
+
+* Migrate to Dart 3 / Flutter 3.16+ (null safety, updated Android Gradle config).
+
 ## 0.0.1
 
 * 基于官方android-serialport-api项目，增加可配置奇偶校验、数据位、停止位；

@@ -4,28 +4,34 @@ version '1.0'
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:8.1.0'
     }
 }
 
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    namespace 'com.sysout.flutter_serial_port_api'
+    compileSdk 34
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdk 16
     }
 
     buildTypes {
@@ -40,12 +46,8 @@ android {
     }
 
     sourceSets {
-        main() {
+        main {
             jniLibs.srcDirs = ['libs']
         }
     }
-}
-
-dependencies {
-    compileOnly files('libs/flutter.jar')
 }

@@ -1,12 +1,11 @@
 name: flutter_serial_port_api
 description: Serial port library based on Android-SerialPort-API.
-version: 0.0.2
-author: Fu Liang <lucasryan@foxmail.com>
-homepage: https://gitee.com/liang-fu/flutter_serial_port_api
+version: 0.1.0
+homepage: https://github.com/francis-minoru/flutter_serial_port_api
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
-  flutter: ">=1.20.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.16.0"
 
 dependencies:
   flutter:
